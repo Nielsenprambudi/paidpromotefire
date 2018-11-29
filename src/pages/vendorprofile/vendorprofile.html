@@ -1,0 +1,108 @@
+<ion-header>
+    <ion-navbar>
+      <ion-title>
+        Profil Vendor
+      </ion-title>
+    </ion-navbar>
+  </ion-header>
+
+<ion-content padding>
+
+  <!-- biodata -->
+  <ion-card >
+    <ion-card-header>
+      Biodata
+    </ion-card-header>
+    <ion-item>
+      Nama
+      <ion-note item-end>
+        {{name}}
+      </ion-note>
+    </ion-item>
+    <ion-item>
+      Alamat
+      <ion-note item-end>
+        {{address}}
+      </ion-note>
+    </ion-item>
+    <ion-item>
+      Kota
+      <ion-note item-end>
+        {{city}}
+      </ion-note>
+    </ion-item>
+    <ion-item>
+      Kontak
+      <ion-note item-end>
+        {{phoneNumb}}
+      </ion-note>
+    </ion-item>
+    <div padding>
+      <button ion-button block>Ubah Biodata</button>
+    </div>
+  </ion-card>
+  <!-- biodata -->
+
+  <!-- ads history -->
+  <ion-card >
+    <ion-card-header>
+      Daftar Iklan Terpasang
+    </ion-card-header>
+    <ion-card>
+      <ion-card-content>
+        Promo 20% penjualan besi
+      </ion-card-content>
+    </ion-card>
+    <ion-card>
+      <ion-card-content>
+        Promo 20% penjualan besi
+      </ion-card-content>
+    </ion-card>
+    <div padding>
+      <button (click)="backToAds()" ion-button block>Tambah Iklan</button>
+    </div>
+  </ion-card>
+  <!-- ads history -->
+
+  <!-- package -->
+  <ion-card >
+    <ion-card-header>
+      Sisa Paket
+    </ion-card-header>
+    <div padding>
+      <h2><b>Sisa 200 poin</b></h2>
+    </div>
+    <div padding>
+      <button (click)="backToPackage()" ion-button block>Tambah poin</button>
+    </div>
+  </ion-card>
+  <!-- package -->
+
+  <!-- upload -->
+  <ion-card >
+    <ion-card-header>
+      Unggah Bukti Transfer
+    </ion-card-header>
+    <div padding>
+      <ion-item>
+        <p>{{ imageURI }}</p>
+        <button ion-button color="secondary" (click)="getImage()">Get Image</button>
+      </ion-item>
+      <ion-item>
+        <h4>Image Preview</h4>
+        <img src="{{imageFileName}}" *ngIf="imageFileName" alt="Ionic File" width="300" />
+      </ion-item>
+    </div>
+    <div padding>
+      <button ion-button block (click)="uploadFile()">Upload</button>
+    </div>
+  </ion-card>
+  <!-- upload -->
+
+  <!-- Log Out -->
+  <ion-card >
+      <button (click)="logOut()" ion-button block>Log Out</button>
+  </ion-card>
+  <!-- Log Out -->
+
+</ion-content>

@@ -1,0 +1,25 @@
+
+
+<ion-content padding>
+
+  <!-- pages for marketer -->
+  <div *ngIf="regType == 'marketer'">
+    <ion-tabs class="tabs-icon">
+      <ion-tab tabIcon="browsers" tabTitle="Iklan" [root]="marketerAds" [rootParams]="params"></ion-tab>
+      <ion-tab tabIcon="contact" tabTitle="Profil" [root]="marketerProfile" [rootParams]="params"></ion-tab>
+    </ion-tabs>
+  </div>
+  <!-- pages for marketer -->
+
+  <!-- pages for vendor -->
+  <div *ngIf="regType == 'vendor'">
+    <ion-tabs class="tabs-icon">
+      <ion-tab tabIcon="contact" tabTitle="Profil" [root]="profile" [rootParams]="params"></ion-tab>
+      <ion-tab tabIcon="browsers" tabTitle="Iklan" [root]="ads" [rootParams]="params"></ion-tab>
+    </ion-tabs>
+  </div>
+  <!-- pages for vendor -->
+
+
+
+</ion-content>

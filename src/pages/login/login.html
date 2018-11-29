@@ -1,0 +1,27 @@
+
+  
+  <ion-content padding>
+      <ion-card>
+        <ion-card-header>
+            Welcome to Paid Promote
+        </ion-card-header>
+        <img src="assets/imgs/logo.png"/>
+            <ion-item>
+                <ion-label floating>Email (i.e: email@mail.com)</ion-label>
+                <ion-input [(ngModel)]="email" style="border-bottom: 1px solid #488aff" type="text"></ion-input>
+            </ion-item>
+
+            <ion-item>
+                <ion-label floating>Password</ion-label>
+                <ion-input [(ngModel)]="password" style="border-bottom: 1px solid #488aff" type="password"></ion-input>
+            </ion-item>
+
+        <div padding>
+            <p style="font-size: 10px; color: red">{{loginError}}</p>
+            <button (click)="signin()" [disabled]="!email || !password "  ion-button block>Sign In</button>
+            <button (click)="loginFB()" ion-button block icon-start><ion-icon name="logo-facebook"></ion-icon>Login by Facebook</button>
+            <p style="font-size: small">Tidak punya akun? <a (click)="register()">Register</a></p>
+        </div>
+    </ion-card>
+  </ion-content>
+  

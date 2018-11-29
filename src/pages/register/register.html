@@ -1,0 +1,66 @@
+<ion-header>
+    <ion-navbar>
+      <ion-title>
+        Kembali ke login
+      </ion-title>
+    </ion-navbar>
+  </ion-header>
+  
+  <ion-content padding>
+            
+        <ion-item>
+            <ion-label floating><span style="color: red">*</span>Nama</ion-label>
+            <ion-input [(ngModel)]="name" style="border-bottom: 1px solid #488aff" type="text"></ion-input>
+        </ion-item>
+
+        <ion-item>
+            <ion-label floating><span style="color: red">*</span>E-mail</ion-label>
+            <ion-input [(ngModel)]="email" style="border-bottom: 1px solid #488aff" type="text"></ion-input>
+        </ion-item>
+
+        <ion-item>
+            <ion-label floating>Alamat</ion-label>
+            <ion-input [(ngModel)]="address" style="border-bottom: 1px solid #488aff" type="text"></ion-input>
+        </ion-item>
+
+        <ion-item>
+            <ion-label floating><span style="color: red">*</span>Kota</ion-label>
+            <ion-select [(ngModel)]="city">
+                <ion-option value="surabaya">Surabaya</ion-option>
+                <ion-option value="jakarta">Jakarta</ion-option>
+            </ion-select>
+        </ion-item>
+
+        <ion-item>
+            <ion-label floating><span style="color: red">*</span>No. Telp/Handphone (without +62)</ion-label>
+            <ion-input [(ngModel)]="phoneNumb" style="border-bottom: 1px solid #488aff" type="number"></ion-input>
+        </ion-item>
+
+        <ion-item>
+            <ion-label floating><span style="color: red">*</span>Register sebagai :</ion-label>
+            <ion-select [(ngModel)]="regType">
+                <ion-option value="vendor">Vendor/Pemasang Iklan</ion-option>
+                <ion-option value="marketer">Marketer/Penyebar Iklan</ion-option>
+            </ion-select>
+        </ion-item>
+
+        <ion-item>
+            <ion-label floating>Username</ion-label>
+            <ion-input [(ngModel)]="username" style="border-bottom: 1px solid #488aff" type="text"></ion-input>
+        </ion-item>
+
+        <ion-item>
+            <ion-label floating><span style="color: red">*</span>Password</ion-label>
+            <ion-input [(ngModel)]="password" style="border-bottom: 1px solid #488aff" type="password"></ion-input>
+        </ion-item>
+
+        <div padding>
+            <p style="font-size: 10px; color: red">{{signupError}}</p>
+            <button (click)="register()" [disabled]="!name || !email || !city || !phoneNumb || !regType || !password" ion-button block>Register</button>
+            <div id="recaptcha-container"></div>
+            <p style="font-size: small">Sudah punya akun? <a (click)="login()">Login</a></p>
+        </div>
+
+        
+  </ion-content>
+  

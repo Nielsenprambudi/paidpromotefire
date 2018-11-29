@@ -1,0 +1,7 @@
+{
+  "name": "paidpromote",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "ionic-angular"
+}

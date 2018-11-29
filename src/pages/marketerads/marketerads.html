@@ -1,0 +1,58 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      Pilih Iklan
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content padding>
+
+  <ion-list>
+    <ion-item-sliding>
+      <ion-item>
+        <ion-avatar item-start>
+          <img src="assets/imgs/venkman.jpg"/>
+        </ion-avatar>
+        <h2>Iklan 1</h2>
+        <p>Geser ke kiri untuk melihat detil pekerjaan</p>
+      </ion-item>
+      <ion-item-options>
+          <button (click)="adsDetail()" ion-button color="primary">
+            Detil
+          </button>
+          <!-- <button ion-button color="secondary">
+            <ion-icon name="checkmark"></ion-icon>
+          </button>
+          <button ion-button color="danger">
+            <ion-icon name="close"></ion-icon>
+          </button> -->
+        </ion-item-options>
+    </ion-item-sliding>
+
+    <ion-item-sliding>
+      <ion-item>
+        <ion-avatar item-start>
+          <img src="assets/imgs/winston.jpg"/>
+        </ion-avatar>
+        <h2>Iklan 2</h2>
+        <p>Geser ke kiri untuk melihat detil pekerjaan</p>
+      </ion-item>
+      <ion-item-options>
+          <button (click)="adsDetail()" ion-button color="primary">
+            Detil
+          </button>
+          <!-- <button ion-button color="secondary">
+            <ion-icon name="checkmark"></ion-icon>
+          </button>
+          <button ion-button color="danger">
+            <ion-icon name="close"></ion-icon>
+          </button> -->
+        </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+
+
+
+</ion-content>
