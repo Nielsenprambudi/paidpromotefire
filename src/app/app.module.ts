@@ -1,6 +1,7 @@
+import { ImagePicker } from '@ionic-native/image-picker';
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
-import { IonicApp, IonicErrorHandler, IonicModule, Modal } from 'ionic-angular';
+import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { Facebook } from '@ionic-native/facebook';
@@ -13,6 +14,7 @@ import { AdsPage } from '../pages/ads/ads';
 import { PackagePage } from '../pages/package/package';
 import { VendorProfilePage } from '../pages/vendorprofile/vendorprofile';
 import { MarketerProfilePage } from './../pages/marketerprofile/marketerprofile';
+import { UpdateBiodataPage } from './../pages/updatebiodata/updatebio';
 import { MarketerAdsPage } from './../pages/marketerads/marketerads';
 import { ModalAdsPage } from './../pages/marketerads/modalads/modalads';
 import { FileTransfer, FileTransferObject } from '@ionic-native/file-transfer';
@@ -27,6 +29,7 @@ import { AngularFireAuthModule } from '@angular/fire/auth';
 import { firebaseConfig } from '../config';
 import { AuthService } from './../services/auth.service';
 import { AddUserService } from './../services/adduser.service';
+import { UploadImageService } from './../services/uploadimage.service';
 
 @NgModule({
   declarations: [
@@ -39,7 +42,8 @@ import { AddUserService } from './../services/adduser.service';
     VendorProfilePage,
     MarketerAdsPage,
     MarketerProfilePage,
-    ModalAdsPage,
+    UpdateBiodataPage,
+    ModalAdsPage
   ],
   imports: [
     BrowserModule,
@@ -60,6 +64,7 @@ import { AddUserService } from './../services/adduser.service';
     VendorProfilePage,
     MarketerAdsPage,
     MarketerProfilePage,
+    UpdateBiodataPage,
     ModalAdsPage
   ],
   providers: [
@@ -67,6 +72,7 @@ import { AddUserService } from './../services/adduser.service';
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     Facebook,
+    ImagePicker,
     FileTransfer,
     FileTransferObject,
     File,
@@ -74,7 +80,8 @@ import { AddUserService } from './../services/adduser.service';
     AngularFireAuth,
     AngularFireDatabase,
     AuthService,
-    AddUserService
+    AddUserService,
+    UploadImageService
   ]
 })
 export class AppModule {}
