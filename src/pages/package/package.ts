@@ -1,6 +1,10 @@
-import { VendorProfilePage } from './../vendorprofile/vendorprofile';
 import { Component } from '@angular/core';
-import { NavController, AlertController } from 'ionic-angular';
+import { ModalController, NavController, AlertController, NavParams } from 'ionic-angular';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { AddUserService } from './../../services/adduser.service';
+import { AuthService } from './../../services/auth.service';
+import { Observable } from 'rxjs-compat';
+
 
 @Component({
   selector: 'page-package',
@@ -8,43 +12,55 @@ import { NavController, AlertController } from 'ionic-angular';
 })
 export class PackagePage {
 
-  regType: any;
+  idParams: any;
+  createPackage: any;
+  packItem: AngularFirestoreCollection<any>;
+  items: Observable<any[]>;
+  
 
-  constructor(public navCtrl: NavController, public alertCtrl: AlertController) {
-    this.regType = "vendor"
+  constructor(public navCtrl: NavController,
+    public modalCtrl: ModalController, 
+    public alertCtrl: AlertController,
+    public navParams: NavParams, 
+    public afs: AngularFirestore,
+    private addUserService: AddUserService,
+    private auth: AuthService,) {
+      let userId = navParams.get('userId')
+      this.idParams = userId
+      console.log("user Id in package", this.idParams)
+      this.packItem = this.afs.collection('package', ref => ref.orderBy('point'));
+      this.items = this.packItem.valueChanges();
+      console.log(this.items)
+          
   }
   
 
-  submitPackageMini() {
-    alert("you have mini package")
-    this.presentPrompt();
+  submitPackage(packageid) {
+    console.log(packageid)
+    this.createPackage = this.afs.collection('transaction')
+    this.createPackage.add({
+      userId: this.idParams,
+      packageId: packageid,
+      status: "Pending"
+    }).then(
+      () => {
+        this.presentPrompt("Konfirmasi Pending", "Transaksi telah tersimpan, silahkan kembali ke halaman profile untuk unggah bukti pembayaran anda")
+      },
+      () => {
+        this.presentPrompt("Gagal", "Silahkan cek kembali jaringan internet anda atau hubungi administrator")
+      }
+    )
   }
 
-  submitPackageMedium() {
-    alert("you have medium package")
-    this.presentPrompt();
-  }
-
-  submitPackageMax() {
-    alert("you have max package")
-    this.presentPrompt();
-  }
-
-  presentPrompt() {
+  presentPrompt(titlePrompt, messagePrompt) {
     let nextStep = this.alertCtrl.create({
-      title: 'Konfirmasi',
-      message: 'Lanjutkan ke tahap unggah bukti transfer ?',
+      title: titlePrompt,
+      message: messagePrompt,
       buttons: [
         {
-          text: 'Nanti',
-          handler: data => {
-            console.log('Batal')
-          }
-        },
-        {
           text: 'Ok',
-          handler: data => {
-            this.navCtrl.setRoot(VendorProfilePage)
+          handler: () => {
+            window.location.reload()
           }
         }
       ]

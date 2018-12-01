@@ -1,10 +1,11 @@
-import { HomePage } from './../home/home';
+import { LoginPage } from './../login/login';
 import { MarketerAdsPage } from './../marketerads/marketerads';
 import { Component } from '@angular/core';
 import { AlertController, NavController, LoadingController, ToastController, NavParams } from 'ionic-angular';
 import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
 import { Camera, CameraOptions } from '@ionic-native/camera';
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AuthService } from './../../services/auth.service';
+import { AngularFirestore } from '@angular/fire/firestore';
 
 @Component({
   selector: 'page-marketerprofile',
@@ -23,6 +24,7 @@ export class MarketerProfilePage {
 
   constructor(public navCtrl: NavController,
     public afs: AngularFirestore,
+    private auth: AuthService,
     public navParams: NavParams,
     public alertCtrl: AlertController,
     private transfer: FileTransfer,
@@ -120,7 +122,8 @@ export class MarketerProfilePage {
   }
 
   logOut() {
-    window.location.reload();
+    this.auth.logOut()
+    this.navCtrl.setRoot(LoginPage)
   }
 
 }

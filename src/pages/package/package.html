@@ -8,7 +8,7 @@
 
 <ion-content padding>
 
-  <ion-card (click)="submitPackageMini()">
+  <!-- <ion-card (click)="submitPackageMini()">
     <ion-card-header>
       <ion-item>
         Promote Mini
@@ -39,7 +39,26 @@
     <ion-card-content>
       Beli 1000 poin
     </ion-card-content>
-  </ion-card>
+  </ion-card> -->
+
+  <div *ngFor="let item of items | async"> 
+
+    <ion-card (click)="submitPackage(item.packageId)">
+      <ion-card-header>
+        <ion-item>
+          {{item.title}}
+        </ion-item>
+      </ion-card-header>
+      <ion-card-content>
+        Beli {{item.point}} poin
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+
+  
+
+
 
 
 </ion-content>

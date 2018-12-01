@@ -1,0 +1,60 @@
+<ion-header>
+    <ion-navbar>
+      <ion-title>
+        Update Biodata
+      </ion-title>
+    </ion-navbar>
+  </ion-header>
+  
+
+
+<ion-content padding>
+            
+    <ion-item>
+        <ion-label floating><span style="color: red">*</span>Nama</ion-label>
+        <ion-input [(ngModel)]="name" style="border-bottom: 1px solid #488aff" type="text"></ion-input>
+    </ion-item>
+
+    <ion-item>
+        <ion-label floating><span style="color: red">*</span>E-mail</ion-label>
+        <ion-input [(ngModel)]="email" disabled style="border-bottom: 1px solid #488aff" type="text"></ion-input>
+    </ion-item>
+
+    <ion-item>
+        <ion-label floating>Alamat</ion-label>
+        <ion-input [(ngModel)]="address" style="border-bottom: 1px solid #488aff" type="text"></ion-input>
+    </ion-item>
+
+    <ion-item>
+        <ion-label floating><span style="color: red">*</span>Kota</ion-label>
+        <ion-select [(ngModel)]="city">
+            <ion-option value="surabaya">Surabaya</ion-option>
+            <ion-option value="jakarta">Jakarta</ion-option>
+        </ion-select>
+    </ion-item>
+
+    <ion-item>
+        <ion-label floating><span style="color: red">*</span>No. Telp/Handphone (without +62)</ion-label>
+        <ion-input [(ngModel)]="phoneNumb" disabled style="border-bottom: 1px solid #488aff" type="number"></ion-input>
+    </ion-item>
+
+    <ion-item>
+        <ion-label floating><span style="color: red">*</span>Register sebagai :</ion-label>
+        <ion-select [(ngModel)]="regType" disabled>
+            <ion-option value="vendor">Vendor/Pemasang Iklan</ion-option>
+            <ion-option value="marketer">Marketer/Penyebar Iklan</ion-option>
+        </ion-select>
+    </ion-item>
+
+    <ion-item>
+        <ion-label floating>Username</ion-label>
+        <ion-input [(ngModel)]="username" style="border-bottom: 1px solid #488aff" type="text"></ion-input>
+    </ion-item>
+
+    <div padding>
+        <p style="font-size: 10px; color: red">{{updateError}}</p>
+        <button (click)="updateBio()" [disabled]="!name || !email || !city || !password" ion-button block>Update</button>
+    </div>
+
+    
+</ion-content>

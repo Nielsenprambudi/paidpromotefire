@@ -24,6 +24,10 @@ export class AuthService {
         return this.afAuth.auth.createUserWithEmailAndPassword(credentials.email, credentials.password)
     }
 
+    logOut() {
+        return this.afAuth.auth.signOut()
+    }
+
     getID() {
         return this.afAuth.auth.currentUser.uid;
     }

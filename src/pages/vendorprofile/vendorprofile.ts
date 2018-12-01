@@ -1,10 +1,13 @@
+import { Camera } from '@ionic-native/camera';
+import { LoginPage } from './../login/login';
 import { PackagePage } from './../package/package';
 import { AdsPage } from './../ads/ads';
 import { Component } from '@angular/core';
-import { AlertController, NavController, LoadingController, ToastController, NavParams } from 'ionic-angular';
-import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
-import { Camera, CameraOptions } from '@ionic-native/camera';
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AlertController, NavController, LoadingController, ToastController, NavParams} from 'ionic-angular';
+import { AuthService } from './../../services/auth.service';
+import { AngularFirestore } from '@angular/fire/firestore';
+import { UpdateBiodataPage } from './../updatebiodata/updatebio';
+import firebase from 'firebase';
 
 @Component({
   selector: 'page-vendorprofile',
@@ -14,23 +17,30 @@ export class VendorProfilePage {
 
   userIdent: any;
   regType: any;
-  imageURI:any;
-  imageFileName:any; 
   name: string;
   address: string;
   city: string;
   phoneNumb: any;
+  getpoint: any;
+  thispoint: any;
+  bigImg = null;
+  bigSize = '0';
+  public myPhotosRef: any;
+  public myPhoto: any;
 
   constructor(public navCtrl: NavController,
     public afs: AngularFirestore,
+    public auth: AuthService,
+    public camera: Camera,
     public navParams: NavParams,
     public alertCtrl: AlertController,
-    private transfer: FileTransfer,
-    private camera: Camera,
     public loadingCtrl: LoadingController,
     public toastCtrl: ToastController) {
-      this.userIdent = navParams.data
-      this.getBiodata(this.userIdent)
+      this.userIdent = navParams.data;
+      this.getBiodata(this.userIdent);
+      this.getPackagePoint(this.userIdent);
+      this.getpoint = 0;
+      this.myPhotosRef = firebase.storage().ref('/uploadPay/');
   }
 
   // get Biodata
@@ -44,87 +54,120 @@ export class VendorProfilePage {
             this.address = type.address;
             this.city = type.city;
             this.phoneNumb = type.phoneNumb;
-            // console.log("document data:", type.regType);
           } else {
             console.log("no such document")
           }
     })
   }
 
-
   // get Biodata
 
-  // upload image
+  // get point
 
-  getImage() {
-    const options: CameraOptions = {
+  getPackagePoint(profile) {
+    const packId = this.afs.collection<any>('transaction').doc(profile.userid);
+    packId.get().subscribe(x => {
+      if(x.exists) {
+        let pack = x.data();
+        if(pack.status != "Pending") {
+          const id = this.afs.collection('package', ref => ref.where('packageId', '==', pack.packageId))
+          const packageItem = id.valueChanges()
+          packageItem.subscribe(y => 
+            y.map(
+                z => 
+                {
+                  this.thispoint = z
+                  this.getpoint = this.thispoint.point;
+                }
+              )
+          )
+        }
+      }
+    })
+  }
+
+  // get point
+
+  // update Biodata
+
+  updateBio() {
+    this.navCtrl.push(UpdateBiodataPage, {userId : this.userIdent.userid})
+  }
+
+  // update Biodata
+
+  // upload image
+ 
+  selectPhoto(): void {
+    this.camera.getPicture({
+      sourceType: this.camera.PictureSourceType.PHOTOLIBRARY,
+      destinationType: this.camera.DestinationType.DATA_URL,
       quality: 100,
-      destinationType: this.camera.DestinationType.FILE_URI,
-      sourceType: this.camera.PictureSourceType.PHOTOLIBRARY
-    }
-  
-    this.camera.getPicture(options).then((imageData) => {
-      this.imageURI = imageData;
-    }, (err) => {
-      console.log(err);
-      this.presentToast(err);
+      encodingType: this.camera.EncodingType.PNG,
+    }).then(imageData => {
+
+      // get image to throw into upload firebase
+      this.myPhoto = imageData;
+      // get image to throw into upload firebase
+
+      // read the image as image
+      let base64Data = 'data:image/jpeg;base64,' + imageData;
+      this.bigImg = base64Data;
+      this.bigSize = this.getImageSize(this.bigImg)
+      // read the image as image
+    }, error => {
+      console.log("ERROR -> " + JSON.stringify(error));
     });
   }
 
-  uploadFile() {
-    let loader = this.loadingCtrl.create({
-      content: "Uploading..."
-    });
-    loader.present();
-    const fileTransfer: FileTransferObject = this.transfer.create();
-  
-    let options: FileUploadOptions = {
-      fileKey: 'ionicfile',
-      fileName: 'ionicfile',
-      chunkedMode: false,
-      mimeType: "image/jpeg",
-      headers: {}
-    }
-  
-    fileTransfer.upload(this.imageURI, 'http://192.168.0.7:8080/api/uploadImage', options)
-      .then((data) => {
-      console.log(data+" Uploaded Successfully");
-      this.imageFileName = "http://192.168.0.7:8080/static/images/ionicfile.jpg"
-      loader.dismiss();
-      this.presentToast("Image uploaded successfully");
-    }, (err) => {
-      console.log(err);
-      loader.dismiss();
-      this.presentToast(err);
-    });
+  getImageSize(data_url) {
+    // get size of image
+    var head = 'data:image/jpeg;base64,';
+    return ((data_url.length - head.length) * 3 / 4 / (1024*1024)).toFixed(4);
+    // get size of image
+  }
+ 
+  uploadPhoto(): void {
+    this.myPhotosRef.child(this.userIdent.userid).child('myPhoto.png')
+      .putString(this.myPhoto, 'base64', { contentType: 'image/png' })
+      .then(() => {
+        this.presentPrompt("Konfirmasi", "Bukti pembayaran berhasil di upload, harap menunggu dalam waktu kurang lebih 24 jam")
+      },
+      () => {
+        this.presentPrompt("Gagal", "Bukti pembayaran tidak berhasil di upload, harap periksa kembali jaringan internet anda atau hubungi administrator")
+      }
+      );
   }
 
   // upload image
 
-  presentToast(msg) {
-    let toast = this.toastCtrl.create({
-      message: msg,
-      duration: 3000,
-      position: 'bottom'
-    });
-  
-    toast.onDidDismiss(() => {
-      console.log('Dismissed toast');
-    });
-  
-    toast.present();
+  presentPrompt(titlePrompt, messagePrompt) {
+    let nextStep = this.alertCtrl.create({
+      title: titlePrompt,
+      message: messagePrompt,
+      buttons: [
+        {
+          text: 'Ok',
+          handler: () => {
+            window.location.reload()
+          }
+        }
+      ]
+    })
+    nextStep.present()
   }
 
   backToAds() {
-    this.navCtrl.push(AdsPage)
+    this.navCtrl.push(AdsPage, {userId : this.userIdent.userid})
   }
 
   backToPackage() {
-    this.navCtrl.push(PackagePage)
+    this.navCtrl.push(PackagePage, {userId : this.userIdent.userid})
   }
 
   logOut() {
-    window.location.reload();
+    this.auth.logOut()
+    this.navCtrl.setRoot(LoginPage)
   }
 
 }

@@ -38,7 +38,7 @@
       </ion-note>
     </ion-item>
     <div padding>
-      <button ion-button block>Ubah Biodata</button>
+      <button (click)="updateBio()" ion-button block>Ubah Biodata</button>
     </div>
   </ion-card>
   <!-- biodata -->
@@ -70,7 +70,7 @@
       Sisa Paket
     </ion-card-header>
     <div padding>
-      <h2><b>Sisa 200 poin</b></h2>
+      <h2><b>Sisa {{getpoint}} poin</b></h2>
     </div>
     <div padding>
       <button (click)="backToPackage()" ion-button block>Tambah poin</button>
@@ -83,19 +83,22 @@
     <ion-card-header>
       Unggah Bukti Transfer
     </ion-card-header>
-    <div padding>
-      <ion-item>
-        <p>{{ imageURI }}</p>
-        <button ion-button color="secondary" (click)="getImage()">Get Image</button>
-      </ion-item>
-      <ion-item>
-        <h4>Image Preview</h4>
-        <img src="{{imageFileName}}" *ngIf="imageFileName" alt="Ionic File" width="300" />
-      </ion-item>
+    <div>
+      <ion-card>
+        <ion-card-content>
+          <button ion-button block color="secondary" (click)="selectPhoto()">Get Image</button>
+        </ion-card-content>
+      </ion-card>
+      <ion-card>
+        <ion-card-content>
+          <img class="img-responsive" src="{{ bigImg }}" />
+        </ion-card-content>
+      </ion-card>
     </div>
     <div padding>
-      <button ion-button block (click)="uploadFile()">Upload</button>
+      <button ion-button block (click)="uploadPhoto()">Upload</button>
     </div>
+    
   </ion-card>
   <!-- upload -->
 
