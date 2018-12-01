@@ -1,8 +1,8 @@
-import { PackagePage } from './../package/package';
 import { Component } from '@angular/core';
-import { AlertController, NavController, LoadingController, ToastController } from 'ionic-angular';
-import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
-import { Camera, CameraOptions } from '@ionic-native/camera';
+import { AlertController, NavController, LoadingController, NavParams } from 'ionic-angular';
+import { Camera } from '@ionic-native/camera';
+import { AngularFirestore } from '@angular/fire/firestore';
+import firebase from 'firebase';
 
 @Component({
   selector: 'page-ads',
@@ -10,107 +10,113 @@ import { Camera, CameraOptions } from '@ionic-native/camera';
 })
 export class AdsPage {
 
-  regType: any;
-  marketerType: any;
-  imageURI:any;
-  imageFileName:any;  
+  idParams      : any;
+  adsTitle      : '';
+  adsDesc       : '';
+  marketerType  : '';
+  createAds : any;
+  adsError  : any;
+  bigImg = null;
+  bigSize = '0';
+  public myPhotosRef: any;
+  public myPhoto: any;  
 
   constructor(public navCtrl: NavController,
     public alertCtrl: AlertController,
-    private transfer: FileTransfer,
+    public afs: AngularFirestore,
+    public navParams: NavParams,
     private camera: Camera,
-    public loadingCtrl: LoadingController,
-    public toastCtrl: ToastController
+    public loadingCtrl: LoadingController
     ) {
-    this.regType = "vendor"
+      let userId = navParams.get('userId')
+      let userParam = navParams.data.userid
+      if (userId != undefined) {
+        this.idParams = userId
+      } else {
+        this.idParams = userParam
+      }
+      console.log("user Id in ads", this.idParams)
+      this.myPhotosRef = firebase.storage().ref('/uploadAds/');
   }
 
   // upload image
-
-  getImage() {
-    const options: CameraOptions = {
+ 
+  selectPhoto(): void {
+    this.camera.getPicture({
+      sourceType: this.camera.PictureSourceType.PHOTOLIBRARY,
+      destinationType: this.camera.DestinationType.DATA_URL,
       quality: 100,
-      destinationType: this.camera.DestinationType.FILE_URI,
-      sourceType: this.camera.PictureSourceType.PHOTOLIBRARY
-    }
-  
-    this.camera.getPicture(options).then((imageData) => {
-      this.presentToast(imageData);
-      this.imageURI = imageData;
-    }, (err) => {
-      console.log(err);
-      this.presentToast(err);
+      encodingType: this.camera.EncodingType.PNG,
+    }).then(imageData => {
+
+      // get image to throw into upload firebase
+      this.myPhoto = imageData;
+      // get image to throw into upload firebase
+
+      // read the image as image
+      let base64Data = 'data:image/jpeg;base64,' + imageData;
+      this.bigImg = base64Data;
+      this.bigSize = this.getImageSize(this.bigImg)
+      // read the image as image
+    }, error => {
+      console.log("ERROR -> " + JSON.stringify(error));
     });
   }
 
-  uploadFile() {
-    let loader = this.loadingCtrl.create({
-      content: "Uploading..."
-    });
-    loader.present();
-    const fileTransfer: FileTransferObject = this.transfer.create();
-  
-    let options: FileUploadOptions = {
-      fileKey: 'ionicfile',
-      fileName: 'ionicfile',
-      chunkedMode: false,
-      mimeType: "image/jpeg",
-      headers: {}
-    }
-  
-    fileTransfer.upload(this.imageURI, 'http://192.168.0.7:8080/api/uploadImage', options)
-      .then((data) => {
-      console.log(data+" Uploaded Successfully");
-      this.imageFileName = "http://192.168.0.7:8080/static/images/ionicfile.jpg"
-      loader.dismiss();
-      this.presentToast("Image uploaded successfully");
-    }, (err) => {
-      console.log(err);
-      loader.dismiss();
-      this.presentToast(err);
-    });
+  getImageSize(data_url) {
+    // get size of image
+    var head = 'data:image/jpeg;base64,';
+    return ((data_url.length - head.length) * 3 / 4 / (1024*1024)).toFixed(4);
+    // get size of image
   }
 
   // upload image
+
+
+
+  // create ads
 
   submitAds() {
-    this.presentPrompt()
+    this.createAds = this.afs.collection('ads');
+    this.createAds.add({
+      userId: this.idParams,
+      adsTitle: this.adsTitle,
+      adsDesc : this.adsDesc,
+      marketerType: this.marketerType
+    }, 
+      error => this.adsError = error.message
+    ).then(
+      () => {
+        this.myPhotosRef.child(this.idParams).child(this.adsTitle + '.png')
+        .putString(this.myPhoto, 'base64', { contentType: 'image/png' })
+        this.presentPrompt("Konfirmasi Berhasil", "Iklan berhasil terdaftar, apabila poin anda telah masuk maka iklan akan muncul tetapi apabila belum silahkan melakukan pembayaran atau menunggu konfirmasi dari administrator")        
+      },
+      () => {
+        this.presentPrompt("Konfirmasi Gagal", "Iklan gagal terdaftar, silahkan periksa kembali jaringan internet anda atau hubungi administrator")
+      }
+    )
+
   }
 
-  presentPrompt() {
+  // create ads
+
+  presentPrompt(titlePrompt, messagePrompt) {
     let nextStep = this.alertCtrl.create({
-      title: 'Konfirmasi',
-      message: 'Lanjutkan ke tahap pemilihan paket ?',
+      title: titlePrompt,
+      message: messagePrompt,
       buttons: [
         {
-          text: 'Batal',
-          handler: data => {
-            console.log('Batal')
-          }
-        },
-        {
           text: 'Ok',
-          handler: data => {
-            this.navCtrl.setRoot(PackagePage)
+          handler: () => {
+            if (titlePrompt == "Konfirmasi Berhasil") {
+              window.location.reload()
+            }
+            
           }
         }
       ]
     })
     nextStep.present()
-  }
-
-  presentToast(msg) {
-    let toast = this.toastCtrl.create({
-      message: msg,
-      duration: 3000,
-      position: 'bottom'
-    });
-  
-    toast.onDidDismiss(() => {
-      console.log('Dismissed toast');
-    });
-  
-    toast.present();
   }
   
 

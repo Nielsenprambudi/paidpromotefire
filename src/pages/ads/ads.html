@@ -8,29 +8,26 @@
 
 
 <ion-content padding>
+  <div>
+    <button ion-button block color="secondary" (click)="selectPhoto()">Get Image</button>
+    <ion-card padding>
+      <ion-card-header>
+        Preview Image
+      </ion-card-header>
+      <ion-card-content>
+        <img class="img-responsive" src="{{ bigImg }}" />
+      </ion-card-content>
+    </ion-card>
+  </div>
 
   <ion-item>
-      <ion-label floating>Judul</ion-label>
-      <ion-input style="border-bottom: 1px solid #488aff" type="text"></ion-input> 
-  </ion-item>
-
-  <ion-item>
-    <ion-item>
-      <p>{{imageURI}}</p>
-      <button ion-button color="secondary" (click)="getImage()">Get Image</button>
-    </ion-item>
-    <ion-item>
-      <h4>Image Preview</h4>
-      <img src="{{imageFileName}}" *ngIf="imageFileName" alt="Ionic File" width="300" />
-    </ion-item>
-    <!-- <ion-item>
-      <button ion-button (click)="uploadFile()">Upload</button>
-    </ion-item> -->
+    <ion-label floating>Judul</ion-label>
+    <ion-input [(ngModel)]="adsTitle" style="border-bottom: 1px solid #488aff" type="text"></ion-input> 
   </ion-item>
 
   <ion-item>
     <ion-label floating>Deskripsi</ion-label>
-    <ion-textarea style="border-bottom: 1px solid #488aff" type="text"></ion-textarea> 
+    <ion-textarea [(ngModel)]="adsDesc" style="border-bottom: 1px solid #488aff" type="text"></ion-textarea> 
   </ion-item>
 
   <ion-item>
@@ -43,7 +40,8 @@
 
 
   <div padding>
-    <button (click)="submitAds()" ion-button block>Submit</button>
+    <p style="font-size: 10px; color: red">{{adsError}}</p>
+    <button (click)="submitAds()" [disabled]="!adsTitle || !adsDesc || !marketerType" ion-button block>Submit</button>
   </div>
 
 
