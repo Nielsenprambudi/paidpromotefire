@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { AlertController, NavController, LoadingController, NavParams } from 'ionic-angular';
 import { Camera } from '@ionic-native/camera';
 import { AngularFirestore } from '@angular/fire/firestore';
 import firebase from 'firebase';
+import * as moment from 'moment';
 
 @Component({
   selector: 'page-ads',
@@ -14,28 +15,48 @@ export class AdsPage {
   adsTitle      : '';
   adsDesc       : '';
   marketerType  : '';
+  create = moment().format("DD MMM YYYY HH:mm:ss");
+  update = moment().format("DD MMM YYYY HH:mm:ss");
   createAds : any;
+  createEdit: any;
+  theAds: any;
   adsError  : any;
+  typeDisable : boolean;
+  createable: boolean;
+  editable: boolean;
   bigImg = null;
   bigSize = '0';
+  public img: any;
   public myPhotosRef: any;
   public myPhoto: any;  
 
   constructor(public navCtrl: NavController,
+    public zone: NgZone,
     public alertCtrl: AlertController,
     public afs: AngularFirestore,
     public navParams: NavParams,
     private camera: Camera,
     public loadingCtrl: LoadingController
     ) {
-      let userId = navParams.get('userId')
-      let userParam = navParams.data.userid
+      let userId = navParams.get('userId');
+      let adTitle = navParams.get('adTitle');
+      let adCreate = navParams.get('adCreate');
+      let userParam = navParams.data.userid;
       if (userId != undefined) {
         this.idParams = userId
       } else {
         this.idParams = userParam
       }
-      console.log("user Id in ads", this.idParams)
+      if(adTitle != undefined && adCreate != undefined) {
+        this.getAds(adTitle)
+        this.typeDisable = true;
+        this.createable = false;
+        this.editable = true;
+      } else {
+        this.typeDisable = false;
+        this.createable = true;
+        this.editable = false;
+      }
       this.myPhotosRef = firebase.storage().ref('/uploadAds/');
   }
 
@@ -58,6 +79,7 @@ export class AdsPage {
       this.bigImg = base64Data;
       this.bigSize = this.getImageSize(this.bigImg)
       // read the image as image
+      this.uploadPhoto();
     }, error => {
       console.log("ERROR -> " + JSON.stringify(error));
     });
@@ -70,6 +92,26 @@ export class AdsPage {
     // get size of image
   }
 
+  uploadPhoto(): void {
+    this.myPhotosRef.child(this.idParams).child(this.adsTitle + '.png')
+      .putString(this.myPhoto, 'base64', { contentType: 'image/png' })
+      // this.getImage()
+      
+  }
+
+  getImage() {
+    try{
+      this.myPhotosRef.child(this.idParams).child(this.adsTitle + '.png').getDownloadURL().then((url) => {
+        this.zone.run(() => {
+          this.img = url
+        })
+      });
+    }
+    catch(e){
+      console.log(e);
+    } 
+  }
+
   // upload image
 
 
@@ -77,28 +119,76 @@ export class AdsPage {
   // create ads
 
   submitAds() {
-    this.createAds = this.afs.collection('ads');
-    this.createAds.add({
-      userId: this.idParams,
-      adsTitle: this.adsTitle,
-      adsDesc : this.adsDesc,
-      marketerType: this.marketerType
-    }, 
-      error => this.adsError = error.message
-    ).then(
-      () => {
-        this.myPhotosRef.child(this.idParams).child(this.adsTitle + '.png')
-        .putString(this.myPhoto, 'base64', { contentType: 'image/png' })
-        this.presentPrompt("Konfirmasi Berhasil", "Iklan berhasil terdaftar, apabila poin anda telah masuk maka iklan akan muncul tetapi apabila belum silahkan melakukan pembayaran atau menunggu konfirmasi dari administrator")        
-      },
-      () => {
-        this.presentPrompt("Konfirmasi Gagal", "Iklan gagal terdaftar, silahkan periksa kembali jaringan internet anda atau hubungi administrator")
-      }
-    )
-
+    this.myPhotosRef.child(this.idParams).child(this.adsTitle + '.png').getDownloadURL().then((url) => {
+      this.zone.run(() => {
+        this.img = url
+        this.createAds = this.afs.doc<any>('ads' + '/' + this.create);
+        this.createAds.set({
+          userId: this.idParams,
+          adsTitle: this.adsTitle,
+          adsDesc : this.adsDesc,
+          adsImg: this.img,
+          marketerType: this.marketerType,
+          create: this.create,
+          update: ""
+        },
+        error => this.adsError = error.message
+        )
+      })
+      this.presentPrompt("Konfirmasi Berhasil", "Iklan berhasil terdaftar, apabila poin anda telah masuk maka iklan akan muncul tetapi apabila belum silahkan melakukan pembayaran atau menunggu konfirmasi dari administrator")  
+    });
+    
   }
 
   // create ads
+
+  // edit ads
+
+  editAds() {
+    let ads = this.afs.doc<any>('ads' + '/' + this.createEdit);
+    ads.update({
+        adsTitle: this.adsTitle,
+        adsDesc: this.adsDesc,
+        update: this.update
+    }).then(() => {
+            this.presentPrompt("Konfirmasi Berhasil", "Iklan anda berhasil diperbaharui")
+        }).catch(() => {
+            this.presentPrompt("Gagal", "Silahkan cek kembali jaringan internet anda atau hubungi administrator")
+        })
+  }
+
+  // edit ads
+
+
+
+  //   get all title, desc, and photo of ads
+
+  getAds(adTitle) {
+    let ads = this.afs.collection('ads', ref => ref.where('adsTitle', '==', adTitle));
+    let argument = ads.valueChanges();
+    argument.subscribe(x => 
+        x.map(
+            y => {
+                this.theAds = y;
+                this.adsTitle = this.theAds.adsTitle;
+                this.adsDesc = this.theAds.adsDesc;
+                this.bigImg = this.theAds.adsImg;
+                this.marketerType = this.theAds.marketerType;
+                this.createEdit = this.theAds.create; 
+                
+            }
+        )
+    )
+
+
+    
+    
+  }
+
+
+  //   get all title, desc, and photo of ads
+
+  
 
   presentPrompt(titlePrompt, messagePrompt) {
     let nextStep = this.alertCtrl.create({

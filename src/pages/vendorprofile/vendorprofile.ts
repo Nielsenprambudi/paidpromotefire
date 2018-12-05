@@ -2,19 +2,21 @@ import { Camera } from '@ionic-native/camera';
 import { LoginPage } from './../login/login';
 import { PackagePage } from './../package/package';
 import { AdsPage } from './../ads/ads';
-import { Component } from '@angular/core';
-import { AlertController, NavController, LoadingController, ToastController, NavParams} from 'ionic-angular';
+import { Component, NgZone} from '@angular/core';
+import { ModalController, AlertController, NavController, LoadingController, ToastController, NavParams} from 'ionic-angular';
 import { AuthService } from './../../services/auth.service';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { Observable } from 'rxjs-compat';
 import { UpdateBiodataPage } from './../updatebiodata/updatebio';
 import firebase from 'firebase';
+import * as moment from 'moment';
+import { async } from 'rxjs/internal/scheduler/async';
 
 @Component({
   selector: 'page-vendorprofile',
   templateUrl: 'vendorprofile.html'
 })
 export class VendorProfilePage {
-
   userIdent: any;
   regType: any;
   name: string;
@@ -23,12 +25,20 @@ export class VendorProfilePage {
   phoneNumb: any;
   getpoint: any;
   thispoint: any;
+  getName: any;
+  public img: string;
   bigImg = null;
   bigSize = '0';
+  create = moment().format("DD MMM YYYY HHmmss");
+  packAds: AngularFirestoreCollection<any>;
+  ads: Observable<any[]>;
   public myPhotosRef: any;
+  public myPhotoAdsRef: any;
   public myPhoto: any;
 
   constructor(public navCtrl: NavController,
+    public zone: NgZone,
+    public modalCtrl: ModalController,
     public afs: AngularFirestore,
     public auth: AuthService,
     public camera: Camera,
@@ -41,7 +51,13 @@ export class VendorProfilePage {
       this.getPackagePoint(this.userIdent);
       this.getpoint = 0;
       this.myPhotosRef = firebase.storage().ref('/uploadPay/');
+      this.myPhotoAdsRef = firebase.storage().ref('/uploadAds/');
+      this.packAds = this.afs.collection('ads', ref => ref.where('userId', '==', this.userIdent.userid).orderBy('create', 'asc'));
+      this.ads = this.packAds.valueChanges();
+      
   }
+
+  
 
   // get Biodata
   
@@ -128,7 +144,7 @@ export class VendorProfilePage {
   }
  
   uploadPhoto(): void {
-    this.myPhotosRef.child(this.userIdent.userid).child('myPhoto.png')
+    this.myPhotosRef.child(this.userIdent.userid).child(this.create + '.png')
       .putString(this.myPhoto, 'base64', { contentType: 'image/png' })
       .then(() => {
         this.presentPrompt("Konfirmasi", "Bukti pembayaran berhasil di upload, harap menunggu dalam waktu kurang lebih 24 jam")
@@ -140,6 +156,33 @@ export class VendorProfilePage {
   }
 
   // upload image
+
+  // ads detil
+
+  adsDetil(userAds, createAds) {
+    this.navCtrl.push(AdsPage, {
+      adTitle : userAds,
+      adCreate : createAds,
+      userId: this.userIdent.userid
+    })
+  }
+
+  // ads detil
+
+  // ads delete
+
+  adsDelete(createAds) {
+    let ads = this.afs.doc<any>('ads' + '/' + createAds);
+    ads.delete().then(() => {
+        this.presentPrompt("Konfirmasi Berhasil", "Data anda berhasil dihapus")
+    }).catch(() => {
+      this.presentPrompt("Gagal", "Data anda gagal dihapus, silahkan cek kembali jaringan internet anda atau hubungi administrator")
+    })
+
+    
+  }
+
+  // ads delete
 
   presentPrompt(titlePrompt, messagePrompt) {
     let nextStep = this.alertCtrl.create({

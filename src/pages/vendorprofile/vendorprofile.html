@@ -48,15 +48,31 @@
     <ion-card-header>
       Daftar Iklan Terpasang
     </ion-card-header>
-    <ion-card>
+    <!-- <ion-card *ngFor="let ad of ads | async">
+      <ion-card-header>
+        {{ ad.adsTitle }}
+      </ion-card-header>
       <ion-card-content>
-        Promo 20% penjualan besi
+        {{ ad.adsDesc }}
       </ion-card-content>
-    </ion-card>
-    <ion-card>
-      <ion-card-content>
-        Promo 20% penjualan besi
-      </ion-card-content>
+    </ion-card> -->
+
+    <ion-card  *ngFor="let ad of ads | async">
+      <ion-list>
+        <ion-item-sliding>
+            <ion-item>
+              <ion-avatar item-start>
+                <img src="{{ad.adsImg}}" />
+              </ion-avatar>
+              <h2>{{ ad.adsTitle }}</h2>
+              <p>{{ ad.adsDesc }}</p>
+            </ion-item>
+            <ion-item-options>
+              <button (click)="adsDetil(ad.adsTitle, ad.create)" ion-button color="primary">Detil</button>
+              <button (click)="adsDelete(ad.create)" ion-button color="secondary">Delete</button>
+            </ion-item-options>
+        </ion-item-sliding>
+      </ion-list>
     </ion-card>
     <div padding>
       <button (click)="backToAds()" ion-button block>Tambah Iklan</button>
@@ -86,7 +102,7 @@
     <div>
       <ion-card>
         <ion-card-content>
-          <button ion-button block color="secondary" (click)="selectPhoto()">Get Image</button>
+          <button ion-button block color="secondary" (click)="selectPhoto()">Ambil Gambar</button>
         </ion-card-content>
       </ion-card>
       <ion-card>
@@ -96,7 +112,7 @@
       </ion-card>
     </div>
     <div padding>
-      <button ion-button block (click)="uploadPhoto()">Upload</button>
+      <button ion-button block (click)="uploadPhoto()">Unggah</button>
     </div>
     
   </ion-card>

@@ -8,22 +8,24 @@
 
 
 <ion-content padding>
-  <div>
-    <button ion-button block color="secondary" (click)="selectPhoto()">Get Image</button>
-    <ion-card padding>
-      <ion-card-header>
-        Preview Image
-      </ion-card-header>
-      <ion-card-content>
-        <img class="img-responsive" src="{{ bigImg }}" />
-      </ion-card-content>
-    </ion-card>
-  </div>
+  
 
   <ion-item>
     <ion-label floating>Judul</ion-label>
     <ion-input [(ngModel)]="adsTitle" style="border-bottom: 1px solid #488aff" type="text"></ion-input> 
   </ion-item>
+
+  <div>
+      <button ion-button block color="secondary" *ngIf="createable" (click)="selectPhoto()">Get Image</button>
+      <ion-card padding>
+        <ion-card-header>
+          Preview Image
+        </ion-card-header>
+        <ion-card-content>
+          <img class="img-responsive" src="{{ bigImg }} " />
+        </ion-card-content>
+      </ion-card>
+    </div>
 
   <ion-item>
     <ion-label floating>Deskripsi</ion-label>
@@ -32,7 +34,7 @@
 
   <ion-item>
     <ion-label floating>Kategori Marketer :</ion-label>
-    <ion-select [(ngModel)]="marketerType">
+    <ion-select [disabled]="typeDisable" [(ngModel)]="marketerType">
         <ion-option value="surabaya">Area Surabaya</ion-option>
         <ion-option value="jakarta">Area Jakarta</ion-option>
     </ion-select>
@@ -41,7 +43,8 @@
 
   <div padding>
     <p style="font-size: 10px; color: red">{{adsError}}</p>
-    <button (click)="submitAds()" [disabled]="!adsTitle || !adsDesc || !marketerType" ion-button block>Submit</button>
+    <button *ngIf="createable" (click)="submitAds()" [disabled]="!adsTitle || !adsDesc || !marketerType || !bigImg" ion-button block>Submit</button>
+    <button *ngIf="editable" (click)="editAds()" [disabled]="!adsTitle || !adsDesc || !marketerType || !bigImg" ion-button block>Edit</button>
   </div>
 
 
